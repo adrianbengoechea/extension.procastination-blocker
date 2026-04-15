@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Procastination Blocker",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Procastination blocker for personal use",
   
     "action": {
