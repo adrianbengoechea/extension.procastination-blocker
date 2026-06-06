@@ -1,67 +1,80 @@
-console.log("> background worker: init");
-
 const BLOCKED_PAGE = "/src/blocked-site/index.html";
 const RULE_ID_BASE = 1;
 
-function normalize(site: string) {
-  console.log("> background worker: normalize", site);
-  return site
-    .replace(/^https?:\/\//, "")
-    .replace(/^www\./, "")
-    .trim();
+interface ParsedSite {
+  domain: string;
+  path: string | null; // null = block entire domain
 }
 
-function updateRules() {
-  console.log("> background worker: updateRules");
-  chrome.storage.sync.get("blockedSites", ({ blockedSites = [] }) => {
-    console.log("> background worker: blockedSites: ", blockedSites);
+function parseSite(site: string): ParsedSite {
+  // Strip protocol
+  const withoutProtocol = site
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "");
 
+  const slashIndex = withoutProtocol.indexOf("/");
+
+  if (slashIndex === -1) {
+    return { domain: withoutProtocol.trim(), path: null };
+  }
+
+  return {
+    domain: withoutProtocol.slice(0, slashIndex).trim(),
+    path: withoutProtocol.slice(slashIndex).trim(), // e.g. "/shorts"
+  };
+}
+
+function escapeForRegex(str: string): string {
+  return str.replace(/\./g, "\\.").replace(/\//g, "\\/");
+}
+
+function buildRegexFilter({ domain, path }: ParsedSite): string {
+  const escapedDomain = escapeForRegex(domain);
+
+  if (path === null || path === "/") {
+    // Block domain and everything under it
+    return `^https?:\\/\\/([^\\/]+\\.)?${escapedDomain}(\\/.*)?$`;
+  }
+
+  const escapedPath = escapeForRegex(path);
+  // Block only this path prefix and anything deeper
+  // domain.com/other or domain.com alone will NOT match
+  return `^https?:\\/\\/([^\\/]+\\.)?${escapedDomain}${escapedPath}(\\/.*|\\?.*)?$`;
+}
+
+function updateRules(): void {
+  chrome.storage.sync.get("blockedSites", ({ blockedSites = [] }) => {
     chrome.declarativeNetRequest.getDynamicRules((existingRules) => {
       const removeRuleIds = existingRules.map((r) => r.id);
 
-      const addRules = blockedSites.map((site, index) => {
-        const clean = normalize(site);
-
-        console.log(
-          "> background worker: addRules: ",
-          site,
-          index,
-          existingRules,
-          RULE_ID_BASE + index,
-        );
-
+      const addRules = (blockedSites as string[]).map((site, index) => {
+        const parsed = parseSite(site);
         return {
           id: RULE_ID_BASE + index,
           priority: 1,
           action: {
-            type: "redirect",
-            redirect: {
-              extensionPath: BLOCKED_PAGE,
-            },
+            type: "redirect" as const,
+            redirect: { extensionPath: BLOCKED_PAGE },
           },
           condition: {
-            regexFilter: `^https?:\\/\\/([^\\/]+\\.)?${clean}(/|$)`,
-            resourceTypes: ["main_frame", "sub_frame"],
+            regexFilter: buildRegexFilter(parsed),
+            resourceTypes: ["main_frame" as const],
           },
         };
       });
 
-      const updateDynamicRules =
-        chrome.declarativeNetRequest.updateDynamicRules({
-          removeRuleIds,
-          addRules,
-        });
-
-      updateDynamicRules.then((r) => {
-        console.log(
-          "> background worker: updateDynamicRules",
-          updateDynamicRules,
-          r,
-        );
-      });
+      chrome.declarativeNetRequest
+        .updateDynamicRules({ removeRuleIds, addRules })
+        .then(() => console.log("> rules updated", addRules))
+        .catch((err) => console.error("> rules error", err));
     });
   });
 }
 
 chrome.runtime.onInstalled.addListener(updateRules);
-chrome.storage.onChanged.addListener(updateRules);
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "sync" && changes.blockedSites) {
+    updateRules();
+  }
+});
