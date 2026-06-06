@@ -7,7 +7,10 @@ export default function App() {
   const [sites, setSites] = useStorage<string[]>("blockedSites", []);
 
   const addSite = () => {
-    const site = siteInput.trim().toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, "");
+    const site = siteInput
+      .trim()
+      .toLowerCase()
+      .replace(/^(https?:\/\/)?(www\.)?/, "");
     if (!site || sites.includes(site)) return;
     setSites([...sites, site]);
     setSiteInput("");
