@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Procastination Blocker",
+  "version": "0.0.7",
+  "description": "Procastination blocker for personal use",
+
+  "action": {
+    "default_popup": "src/popup/index.html"
+  },
+
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module",
+    "run_at": "document_start"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+
+  "options_ui": {
+    "page": "src/options/index.html",
+    "open_in_tab": true
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["src/blocked-site/index.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "activeTab",
+    "tabs",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": ["<all_urls>"]
+}
