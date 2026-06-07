@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Procastination Blocker",
-  "version": "1.0.5",
+  "version": "0.0.7",
   "description": "Procastination blocker for personal use",
 
   "action": {
@@ -25,6 +25,13 @@
     "page": "src/options/index.html",
     "open_in_tab": true
   },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["src/blocked-site/index.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
 
   "permissions": [
     "storage",

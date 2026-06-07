@@ -21,13 +21,12 @@ function isBlocked(url: string, blockedSites: string[]): boolean {
   const current = new URL(url);
   const currentDomain = current.hostname.replace(/^www\./, "");
   const currentPath = current.pathname;
-
   return blockedSites.some((site) => {
     const { domain, path } = parseSite(site);
     const domainMatch =
       currentDomain === domain || currentDomain.endsWith(`.${domain}`);
     if (!domainMatch) return false;
-    if (path === null || path === "/") return true; // entire domain blocked
+    if (path === null || path === "/") return true;
     return (
       currentPath === path ||
       currentPath.startsWith(`${path}/`) ||
@@ -44,22 +43,28 @@ function checkAndRedirect() {
   });
 }
 
-// Initial check (handles hard navigations that slip past DNR)
-checkAndRedirect();
+let lastUrl = window.location.href;
 
-// Watch SPA navigations via history API
+function onUrlChange() {
+  if (window.location.href === lastUrl) return;
+  lastUrl = window.location.href;
+  checkAndRedirect();
+}
+
 const originalPushState = history.pushState.bind(history);
 const originalReplaceState = history.replaceState.bind(history);
 
 history.pushState = (...args) => {
   originalPushState(...args);
-  checkAndRedirect();
+  onUrlChange();
 };
-
 history.replaceState = (...args) => {
   originalReplaceState(...args);
-  checkAndRedirect();
+  onUrlChange();
 };
 
-// Catch popstate (back/forward buttons)
-window.addEventListener("popstate", checkAndRedirect);
+window.addEventListener("popstate", onUrlChange);
+
+setInterval(onUrlChange, 250);
+
+checkAndRedirect();
