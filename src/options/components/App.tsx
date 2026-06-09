@@ -1,11 +1,8 @@
 import { useState } from "preact/hooks";
 
-import { useStorage } from "../../hooks/useStorage";
-import { useSites } from "../../hooks/useSites.tsx";
+import { useSites } from "../../hooks/useSites";
 
 import ListItem from "./ListItem.tsx";
-
-import type { Site } from "../../interfaces/site.ts";
 
 export default function App() {
   const [siteInput, setSiteInput] = useState("");
