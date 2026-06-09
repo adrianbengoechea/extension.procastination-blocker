@@ -1,3 +1,5 @@
+import type { Site } from "../interfaces/site";
+
 const BLOCKED_PAGE = "/src/blocked-site/index.html";
 const RULE_ID_BASE = 1;
 
@@ -47,11 +49,14 @@ function updateRules(): void {
     chrome.declarativeNetRequest.getDynamicRules((existingRules) => {
       const removeRuleIds = existingRules.map((r) => r.id);
 
-      const addRules = (blockedSites as string[]).map((site, index) => {
-        const parsed = parseSite(site);
+      const activeBlockedSites = blockedSites.filter((el, i) => el.active);
+
+      const addRules = (activeBlockedSites as Site[]).map((site, index) => {
+        const parsed = parseSite(site.url);
         return {
           id: RULE_ID_BASE + index,
           priority: 1,
+
           action: {
             type: "redirect" as const,
             redirect: { extensionPath: BLOCKED_PAGE },
@@ -62,6 +67,8 @@ function updateRules(): void {
           },
         };
       });
+
+      console.log(addRules);
 
       chrome.declarativeNetRequest
         .updateDynamicRules({ removeRuleIds, addRules })

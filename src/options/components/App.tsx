@@ -1,24 +1,20 @@
 import { useState } from "preact/hooks";
+
 import { useStorage } from "../../hooks/useStorage";
+import { useSites } from "../../hooks/useSites.tsx";
+
 import ListItem from "./ListItem.tsx";
+
+import type { Site } from "../../interfaces/site.ts";
 
 export default function App() {
   const [siteInput, setSiteInput] = useState("");
-  const [sites, setSites] = useStorage<string[]>("blockedSites", []);
+  const { sites, handleAdd, handleToggle, handleRemove, handleReset } =
+    useSites();
 
-  const addSite = () => {
-    const site = siteInput
-      .trim()
-      .toLowerCase()
-      .replace(/^(https?:\/\/)?(www\.)?/, "");
-    if (!site || sites.includes(site)) return;
-    setSites([...sites, site]);
-    setSiteInput("");
-  };
-
-  const removeSite = (index: number) => {
-    setSites(sites.filter((_, i) => i !== index));
-  };
+  // const toggleSite = (index: number) => {
+  //   setSites(sites.filter((_, i) => i !== index));
+  // }
 
   return (
     <div>
@@ -29,13 +25,28 @@ export default function App() {
         value={siteInput}
         onInput={(e) => setSiteInput(e.target.value)}
       />
-      <button onClick={addSite}>Add</button>
+      <button onClick={() => handleAdd(siteInput)}>Add</button>
 
       <ul>
         {sites.map((site, index) => (
-          <ListItem key={site} site={site} onRemove={() => removeSite(index)} />
+          <ListItem
+            key={site}
+            site={site}
+            onToggle={() => handleToggle(index)}
+            onRemove={() => handleRemove(index)}
+          />
         ))}
       </ul>
+      <br />
+      <button
+        onClick={() => {
+          if (confirm(`Confirm sites reset?`)) {
+            handleReset();
+          }
+        }}
+      >
+        Reset
+      </button>
     </div>
   );
 }
