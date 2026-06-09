@@ -1,3 +1,5 @@
+import type { Site } from "../interfaces/site";
+
 const BLOCKED_PAGE = chrome.runtime.getURL("src/blocked-site/index.html");
 
 interface ParsedSite {
@@ -17,12 +19,15 @@ function parseSite(site: string): ParsedSite {
   };
 }
 
-function isBlocked(url: string, blockedSites: string[]): boolean {
+function isBlocked(url: string, blockedSites: Site[]): boolean {
   const current = new URL(url);
   const currentDomain = current.hostname.replace(/^www\./, "");
   const currentPath = current.pathname;
-  return blockedSites.some((site) => {
-    const { domain, path } = parseSite(site);
+
+  const activeBlockedSites = blockedSites.filter((el, i) => el.active);
+
+  return activeBlockedSites.some((site) => {
+    const { domain, path } = parseSite(site.url);
     const domainMatch =
       currentDomain === domain || currentDomain.endsWith(`.${domain}`);
     if (!domainMatch) return false;
