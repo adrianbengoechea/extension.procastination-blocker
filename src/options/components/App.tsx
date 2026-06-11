@@ -3,6 +3,7 @@ import { useState } from "preact/hooks";
 import { useSites } from "../../hooks/useSites";
 
 import ListItem from "./ListItem.tsx";
+import { Topics } from "./Topics.tsx";
 
 export default function App() {
   const [siteInput, setSiteInput] = useState("");
@@ -34,6 +35,8 @@ export default function App() {
           />
         ))}
       </ul>
+      <br />
+      <Topics />
       <br />
       <button
         onClick={() => {

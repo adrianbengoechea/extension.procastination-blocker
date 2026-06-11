@@ -1,4 +1,5 @@
 import type { Site } from "../interfaces/site";
+import { getAllBlockedSites } from "../presets";
 
 const BLOCKED_PAGE = chrome.runtime.getURL("src/blocked-site/index.html");
 
@@ -19,14 +20,14 @@ function parseSite(site: string): ParsedSite {
   };
 }
 
-function isBlocked(url: string, blockedSites: Site[]): boolean {
+function isBlocked(url: string, sites: Site[]): boolean {
   const current = new URL(url);
   const currentDomain = current.hostname.replace(/^www\./, "");
   const currentPath = current.pathname;
 
-  const activeBlockedSites = blockedSites.filter((el, i) => el.active);
+  const activeSites = sites.filter((s) => s.active);
 
-  return activeBlockedSites.some((site) => {
+  return activeSites.some((site) => {
     const { domain, path } = parseSite(site.url);
     const domainMatch =
       currentDomain === domain || currentDomain.endsWith(`.${domain}`);
@@ -41,11 +42,18 @@ function isBlocked(url: string, blockedSites: Site[]): boolean {
 }
 
 function checkAndRedirect() {
-  chrome.storage.sync.get("blockedSites", ({ blockedSites = [] }) => {
-    if (isBlocked(window.location.href, blockedSites)) {
-      window.location.replace(BLOCKED_PAGE);
-    }
-  });
+  chrome.storage.sync.get(
+    ["blockedSites", "blockedPresets"],
+    ({ blockedSites = [], blockedPresets = [] }) => {
+      const allSites = getAllBlockedSites(
+        blockedSites as Site[],
+        blockedPresets as string[],
+      );
+      if (isBlocked(window.location.href, allSites)) {
+        window.location.replace(BLOCKED_PAGE);
+      }
+    },
+  );
 }
 
 let lastUrl = window.location.href;
