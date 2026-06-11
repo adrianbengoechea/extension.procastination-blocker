@@ -6,16 +6,29 @@ interface Props {
 }
 
 export const TopicList = ({ title, topic, checked, onToggle }: Props) => {
-  const wrapperStyles = `block border-1 border-solid p-4 ${checked ? 'border-green' : 'border-black'}`;
+  const wrapperStyles = {
+    border: '1px solid black',
+    display: 'block',
+    padding: '10px 30px 20px',
+    borderRadius: '10px',
+    background: '#FFF',
+    boxShadow: '0px 3px 10px rgba(0, 0,0, 0.2)',
+    width: '100%',
+    maxWidth: '140px'
+  }
+
+  if (checked) {
+    wrapperStyles.border = '1px solid green';
+  }
 
   return (
-    <div className={wrapperStyles}>
+    <div style={wrapperStyles}>
       <h3>{title}</h3>
       <label>
         <input type="checkbox" checked={checked} onInput={onToggle} /><span>Block sites</span>
       </label>
       <h4>Target sites:</h4>
-      <ul>
+      <ul style={{paddingLeft: '16px'}}>
         {
           topic.map(
             (item, index) => (

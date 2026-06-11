@@ -21,7 +21,7 @@ export const Topics = () => {
   };
 
   return (
-    <div className="container flex flex-row flex-wrap">
+    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '30px', padding: '10px 20px'}}>
       <TopicList title="Adult Content" topic={PRESET_ADULT} checked={isChecked('adult')} onToggle={() => handleToggle('adult')} />
       <TopicList title="Entertainment" topic={PRESET_ENTERTAINMENT} checked={isChecked('entertainment')} onToggle={() => handleToggle('entertainment')} />
       <TopicList title="Gambling" topic={PRESET_GAMBLING} checked={isChecked('gambling')} onToggle={() => handleToggle('gambling')} />
