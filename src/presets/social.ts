@@ -1,0 +1,20 @@
+export const PRESET_SOCIAL = [
+  "facebook.com",
+  "instagram.com",
+  "twitter.com",
+  "x.com",
+  "tiktok.com",
+  "snapchat.com",
+  "pinterest.com",
+  "linkedin.com",
+  "reddit.com",
+  "tumblr.com",
+  "threads.net",
+  "mastodon.social",
+  "discord.com",
+  "telegram.org",
+  "whatsapp.com",
+  "bereal.com",
+  "vk.com",
+  "weibo.com"
+];

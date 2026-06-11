@@ -1,0 +1,23 @@
+export const PRESET_ENTERTAINMENT = [
+  "youtube.com",
+  "netflix.com",
+  "twitch.tv",
+  "hulu.com",
+  "disneyplus.com",
+  "hbomax.com",
+  "max.com",
+  "primevideo.com",
+  "peacocktv.com",
+  "paramountplus.com",
+  "crunchyroll.com",
+  "funimation.com",
+  "dailymotion.com",
+  "vimeo.com",
+  "rumble.com",
+  "kick.com",
+  "spotify.com",
+  "soundcloud.com",
+  "9gag.com",
+  "ifunny.co",
+  "buzzfeed.com"
+];

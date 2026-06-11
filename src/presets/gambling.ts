@@ -1,0 +1,20 @@
+export const PRESET_GAMBLING = [
+  "bet365.com",
+  "draftkings.com",
+  "fanduel.com",
+  "pokerstars.com",
+  "888casino.com",
+  "betway.com",
+  "bovada.lv",
+  "caesarscasino.com",
+  "betmgm.com",
+  "pointsbet.com",
+  "unibet.com",
+  "williamhill.com",
+  "ladbrokes.com",
+  "betfair.com",
+  "partypoker.com",
+  "wsop.com",
+  "slotomania.com",
+  "pulsz.com"
+];
